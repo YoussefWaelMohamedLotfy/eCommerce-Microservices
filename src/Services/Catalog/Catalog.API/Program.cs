@@ -10,6 +10,8 @@ builder.Host.UseSerilog(Serilogger.Configure);
 builder.Services.AddScoped<ICatalogContext, CatalogContext>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
+builder.Services.AddOutputCache();
+
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -26,6 +28,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseOutputCache();
+
 var catalogEndpointGroup = app.MapGroup("/api/v1/Catalog")
     .WithOpenApi();
 
@@ -41,6 +45,7 @@ catalogEndpointGroup.MapGet("/{id:length(24)}", async (string id, IProductReposi
     var product = await repo.GetProduct(id).ConfigureAwait(false);
     return Results.Ok(product);
 })
+    .CacheOutput()
     .WithName("GetProduct")
     .WithSummary("Get product with an ID");
 
