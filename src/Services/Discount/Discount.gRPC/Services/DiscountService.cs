@@ -22,8 +22,8 @@ public sealed class DiscountService : DiscountProtoService.DiscountProtoServiceB
     {
         var coupon = await _repository.GetDiscount(request.ProductName, context.CancellationToken).ConfigureAwait(false)
             ?? throw new RpcException(new Status(StatusCode.NotFound, $"Discount with ProductName={request.ProductName} is not found."));
-        
-        _logger.LogInformation("Discount is retrieved for ProductName : {productName}, Amount : {amount}", coupon.ProductName, coupon.Amount);
+
+        DiscountLogger.LogSuccessGet(_logger, coupon.ProductName, coupon.Amount);
 
         return _mapper.MapToCouponModel(coupon);
     }
@@ -33,7 +33,7 @@ public sealed class DiscountService : DiscountProtoService.DiscountProtoServiceB
         var coupon = _mapper.MapToCoupon(request.Coupon);
 
         await _repository.CreateDiscount(coupon, context.CancellationToken).ConfigureAwait(false);
-        _logger.LogInformation("Discount is successfully created. ProductName : {ProductName}", coupon.ProductName);
+        DiscountLogger.LogSuccessCreate(_logger, coupon.ProductName);
 
         return _mapper.MapToCouponModel(coupon);
     }
@@ -43,7 +43,7 @@ public sealed class DiscountService : DiscountProtoService.DiscountProtoServiceB
         var coupon = _mapper.MapToCoupon(request.Coupon);
 
         await _repository.UpdateDiscount(coupon, context.CancellationToken).ConfigureAwait(false);
-        _logger.LogInformation("Discount is successfully updated. ProductName : {ProductName}", coupon.ProductName);
+        DiscountLogger.LogSuccessUpdate(_logger, coupon.ProductName);
 
         return _mapper.MapToCouponModel(coupon);
     }
@@ -53,4 +53,19 @@ public sealed class DiscountService : DiscountProtoService.DiscountProtoServiceB
         bool deleted = await _repository.DeleteDiscount(request.ProductName, context.CancellationToken).ConfigureAwait(false);
         return new() { Success = deleted };
     }
+}
+
+public static partial class DiscountLogger
+{
+    [LoggerMessage(Message = "Discount is retrieved for ProductName: {productName}, Amount: {amount}",
+        Level = LogLevel.Information, EventId = 0)]
+    public static partial void LogSuccessGet(ILogger logger, string productName, int amount);
+
+    [LoggerMessage(Message = "Discount is successfully created. ProductName : {productName}",
+        Level = LogLevel.Information, EventId = 1)]
+    public static partial void LogSuccessCreate(ILogger logger, string productName);
+
+    [LoggerMessage(Message = "Discount is successfully updated. ProductName : {productName}",
+        Level = LogLevel.Information, EventId = 2)]
+    public static partial void LogSuccessUpdate(ILogger logger, string productName);
 }
