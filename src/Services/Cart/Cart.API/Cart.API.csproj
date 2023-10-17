@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Grpc.AspNetCore" Version="2.57.0" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.12" />
         <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="7.0.12" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
@@ -16,4 +17,8 @@
         <ProjectReference Include="..\..\..\Shared\Shared.Utilites\Shared.Utilites.csproj" />
     </ItemGroup>
 
-</Project>
+    <ItemGroup>
+      <Protobuf Include="Protos\discount.proto" GrpcServices="Client" />
+    </ItemGroup>
+
+ </Project>

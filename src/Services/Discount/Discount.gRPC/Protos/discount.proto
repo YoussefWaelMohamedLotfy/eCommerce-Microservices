@@ -5,30 +5,30 @@ import "google/api/annotations.proto";
 
 service DiscountProtoService {
 	rpc GetDiscount (GetDiscountRequest) returns (CouponModel) {
-        option(google.api.http) = {
-            get: "/api/v1/Discount/{productName}"
-        };
-    }
+		option(google.api.http) = {
+			get: "/api/v1/Discount/{productName}"
+		};
+	}
 
 	rpc CreateDiscount (CreateDiscountRequest) returns (CouponModel) {
-        option(google.api.http) = {
-            post: "/api/v1/Discount",
-            body: "coupon"
-        };
-    }
+		option(google.api.http) = {
+			post: "/api/v1/Discount",
+			body: "coupon"
+		};
+	}
 
 	rpc UpdateDiscount (UpdateDiscountRequest) returns (CouponModel) {
-        option(google.api.http) = {
-            put: "/api/v1/Discount",
-            body: "coupon"
-        };
-    }
+		option(google.api.http) = {
+			put: "/api/v1/Discount",
+			body: "coupon"
+		};
+	}
 
 	rpc DeleteDiscount (DeleteDiscountRequest) returns (DeleteDiscountResponse) {
-        option(google.api.http) = {
-            delete: "/api/v1/Discount/{productName}"
-        };
-    }
+		option(google.api.http) = {
+			delete: "/api/v1/Discount/{productName}"
+		};
+	}
 }
 
 message GetDiscountRequest {

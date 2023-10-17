@@ -11,27 +11,12 @@ public sealed class ShoppingCart
 
     public List<ShoppingCartItem> Items { get; set; } = new List<ShoppingCartItem>();
 
-    public ShoppingCart()
-    {
-    }
+    public ShoppingCart() { }
 
     public ShoppingCart(string username)
     {
         UserName = username;
     }
 
-    public decimal TotalPrice
-    {
-        get
-        {
-            decimal result = 0;
-
-            foreach (var item in Items)
-            {
-                result += item.Price * item.Quantity;
-            }
-
-            return result;
-        }
-    }
+    public decimal TotalPrice => Items.Sum(item => item.Price * item.Quantity);
 }
