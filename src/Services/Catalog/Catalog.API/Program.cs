@@ -33,43 +33,44 @@ app.UseOutputCache();
 var catalogEndpointGroup = app.MapGroup("/api/v1/Catalog")
     .WithOpenApi();
 
-catalogEndpointGroup.MapGet("/", async (IProductRepository repo) =>
+catalogEndpointGroup.MapGet("/", async (IProductRepository repo, CancellationToken ct) =>
 {
-    var products = await repo.GetProducts().ConfigureAwait(false);
+    var products = await repo.GetProducts(ct).ConfigureAwait(false);
     return Results.Ok(products);
 })
     .WithSummary("Get all products");
 
-catalogEndpointGroup.MapGet("/{id:length(24)}", async (string id, IProductRepository repo) =>
+catalogEndpointGroup.MapGet("/{id:length(24)}", async (string id, IProductRepository repo, CancellationToken ct) =>
 {
-    var product = await repo.GetProduct(id).ConfigureAwait(false);
+    var product = await repo.GetProduct(id, ct).ConfigureAwait(false);
     return Results.Ok(product);
 })
     .CacheOutput()
     .WithName("GetProduct")
     .WithSummary("Get product with an ID");
 
-catalogEndpointGroup.MapGet("/Category/{category}", async (string category, IProductRepository repo) =>
+catalogEndpointGroup.MapGet("/Category/{category}", async (string category, IProductRepository repo,
+    CancellationToken ct) =>
 {
-    var products = await repo.GetProductByCategory(category).ConfigureAwait(false);
+    var products = await repo.GetProductByCategory(category, ct).ConfigureAwait(false);
     return Results.Ok(products);
 })
     .WithSummary("Get products for a category");
 
-catalogEndpointGroup.MapPost("/", async (Product newProduct, IProductRepository repo) =>
+catalogEndpointGroup.MapPost("/", async (Product newProduct, IProductRepository repo, CancellationToken ct) =>
 {
-    await repo.CreateProduct(newProduct).ConfigureAwait(false);
+    await repo.CreateProduct(newProduct, ct).ConfigureAwait(false);
     return Results.CreatedAtRoute("GetProduct", new { id = newProduct.Id }, newProduct);
 })
     .WithSummary("Creates a new product in catalog");
 
-catalogEndpointGroup.MapPut("/", async (Product updatedProduct, IProductRepository repo)
-    => Results.Ok(await repo.UpdateProduct(updatedProduct).ConfigureAwait(false)))
+catalogEndpointGroup.MapPut("/", async (Product updatedProduct, IProductRepository repo, CancellationToken ct)
+    => Results.Ok(await repo.UpdateProduct(updatedProduct, ct).ConfigureAwait(false)))
     .WithSummary("Updates existing product in catalog");
 
-catalogEndpointGroup.MapDelete("/{id:length(24)}", async (string id, IProductRepository repo) =>
+catalogEndpointGroup.MapDelete("/{id:length(24)}", async (string id, IProductRepository repo, CancellationToken ct) =>
 {
-    var isDeleted = await repo.DeleteProduct(id).ConfigureAwait(false);
+    var isDeleted = await repo.DeleteProduct(id, ct).ConfigureAwait(false);
     return isDeleted ? Results.NoContent() : Results.NotFound();
 })
     .WithSummary("Deletes a product from catalog");
