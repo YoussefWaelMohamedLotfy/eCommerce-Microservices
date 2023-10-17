@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+option csharp_namespace = "Discount.gRPC.Protos";
+import "google/api/annotations.proto";
+
+service DiscountProtoService {
+	rpc GetDiscount (GetDiscountRequest) returns (CouponModel) {
+        option(google.api.http) = {
+            get: "/api/v1/Discount/{productName}"
+        };
+    }
+
+	rpc CreateDiscount (CreateDiscountRequest) returns (CouponModel) {
+        option(google.api.http) = {
+            post: "/api/v1/Discount"
+        };
+    }
+
+	rpc UpdateDiscount (UpdateDiscountRequest) returns (CouponModel) {
+        option(google.api.http) = {
+            put: "/api/v1/Discount"
+        };
+    }
+
+	rpc DeleteDiscount (DeleteDiscountRequest) returns (DeleteDiscountResponse) {
+        option(google.api.http) = {
+            delete: "/api/v1/Discount/{productName}"
+        };
+    }
+}
+
+message GetDiscountRequest {
+	string productName = 1;	
+}
+
+message CouponModel {
+	int32 id = 1;
+	string productName = 2;
+	string description = 3;
+	int32 amount = 4;
+}
+
+message CreateDiscountRequest {
+	CouponModel coupon = 1;
+}
+
+message UpdateDiscountRequest {
+	CouponModel coupon = 1;
+}
+
+message DeleteDiscountRequest {
+	string productName = 1;
+}
+
+message DeleteDiscountResponse {
+	bool success = 1;
+}
