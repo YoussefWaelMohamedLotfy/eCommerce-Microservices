@@ -12,13 +12,15 @@ service DiscountProtoService {
 
 	rpc CreateDiscount (CreateDiscountRequest) returns (CouponModel) {
         option(google.api.http) = {
-            post: "/api/v1/Discount"
+            post: "/api/v1/Discount",
+            body: "coupon"
         };
     }
 
 	rpc UpdateDiscount (UpdateDiscountRequest) returns (CouponModel) {
         option(google.api.http) = {
-            put: "/api/v1/Discount"
+            put: "/api/v1/Discount",
+            body: "coupon"
         };
     }
 
