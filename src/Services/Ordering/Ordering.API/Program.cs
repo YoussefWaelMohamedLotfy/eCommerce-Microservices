@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Ordering.Application;
 using Ordering.Infrastructure;
 using Serilog;
@@ -5,6 +6,12 @@ using Serilog;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseSerilog(Serilogger.Configure);
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ConfigureEndpointDefaults(o => o.Protocols = HttpProtocols.Http1AndHttp2AndHttp3);
+    options.ConfigureHttpsDefaults(o => o.AllowAnyClientCertificate());
+});
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

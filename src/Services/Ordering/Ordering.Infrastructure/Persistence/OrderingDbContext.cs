@@ -15,6 +15,6 @@ public sealed class OrderingDbContext : DbContext
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
-        configurationBuilder.Conventions.Add(_ => new StringMaxLengthConversion(20));
+        configurationBuilder.Conventions.Add(_ => new StringMaxLengthConversion(100));
     }
 }

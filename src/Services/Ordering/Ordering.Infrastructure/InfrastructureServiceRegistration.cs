@@ -9,7 +9,7 @@ public static class InfrastructureServiceRegistration
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<OrderingDbContext>(options =>
+        services.AddDbContextPool<OrderingDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
         return services;
