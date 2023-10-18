@@ -2,11 +2,18 @@ using Cart.API.Data;
 using Cart.API.Repositories;
 using Cart.API.Services;
 using Discount.gRPC.Protos;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseSerilog(Serilogger.Configure);
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ConfigureEndpointDefaults(o => o.Protocols = HttpProtocols.Http1AndHttp2AndHttp3);
+    options.ConfigureHttpsDefaults(o => o.AllowAnyClientCertificate());
+});
 
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 
