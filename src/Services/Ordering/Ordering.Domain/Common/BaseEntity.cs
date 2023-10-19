@@ -2,5 +2,5 @@
 
 public abstract class BaseEntity<T>
 {
-    public T ID { get; protected set; } = default!;
+    public T ID { get; set; } = default!;
 }

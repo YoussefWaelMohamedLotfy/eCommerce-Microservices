@@ -1,3 +1,4 @@
+using Catalog.API;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Ordering.Application;
 using Ordering.Infrastructure;
@@ -32,13 +33,5 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var orderingEndpointGroup = app.MapGroup("/api/v1/Ordering")
-    .WithOpenApi();
-
-orderingEndpointGroup.MapGet("/{username}", async (string username, CancellationToken ct) =>
-{
-
-})
-    .WithSummary("Get orders for a certain username");
-
+app.MapEndpoints();
 app.Run();

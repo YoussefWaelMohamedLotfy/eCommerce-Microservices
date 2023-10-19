@@ -3,7 +3,7 @@
 using Ordering.Domain.Entities;
 using Ordering.Infrastructure.Persistence.Convensions;
 
-namespace Ordering.Domain.Persistence;
+namespace Ordering.Infrastructure.Persistence;
 
 public sealed class OrderingDbContext : DbContext
 {
