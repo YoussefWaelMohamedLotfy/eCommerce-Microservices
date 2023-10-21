@@ -1,7 +1,12 @@
 using Catalog.API;
+
+using Discount.gRPC.Extensions;
+
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Ordering.Application;
 using Ordering.Infrastructure;
+using Ordering.Infrastructure.Persistence;
+
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,6 +34,8 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    app.MigrateDatabase<OrderingDbContext>();
 }
 
 app.UseHttpsRedirection();

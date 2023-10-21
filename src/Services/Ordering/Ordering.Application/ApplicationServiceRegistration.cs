@@ -1,9 +1,7 @@
 ﻿using System.Reflection;
 using FluentValidation;
 using Mediator;
-
 using Microsoft.Extensions.DependencyInjection;
-
 using Ordering.Application.Behaviours;
 
 namespace Ordering.Application;
