@@ -7,20 +7,20 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Grpc.AspNetCore" Version="2.58.0" />
         <PackageReference Include="MassTransit.RabbitMQ" Version="8.1.1" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.12" />
-        <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="7.0.12" />
-        <PackageReference Include="Riok.Mapperly" Version="3.2.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.12">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Polly" Version="8.0.0" />
+
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\Shared\Shared.Utilites\Shared.Utilites.csproj" />
+        <ProjectReference Include="..\Ordering.Application\Ordering.Application.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Protobuf Include="Protos\discount.proto" GrpcServices="Client" />
-    </ItemGroup>
-
- </Project>
+</Project>

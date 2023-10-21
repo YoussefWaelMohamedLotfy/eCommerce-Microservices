@@ -1,12 +1,25 @@
 using Cart.API.Data;
+using Cart.API.Mappings;
 using Cart.API.Repositories;
 using Cart.API.Services;
 using Discount.gRPC.Protos;
+
+using MassTransit;
+
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Serilog;
+
+using Shared.Utilites.EventBus.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseSerilog(Serilogger.Configure);
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ConfigureEndpointDefaults(o => o.Protocols = HttpProtocols.Http1AndHttp2AndHttp3);
+    options.ConfigureHttpsDefaults(o => o.AllowAnyClientCertificate());
+});
 
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 
@@ -20,6 +33,20 @@ builder.Services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>(
     => o.Address = new Uri(builder.Configuration.GetConnectionString("DiscountGrpcUrl")!));
 
 builder.Services.AddScoped<DiscountGrpcService>();
+
+builder.Services.AddMassTransit(x =>
+{
+    x.UsingRabbitMq((context, config) =>
+    {
+        config.Host(builder.Configuration["EventBusSettings:RabbitMQHostAddress"], "/", h =>
+        {
+            h.Username(builder.Configuration["EventBusSettings:RabbitMQHostUsername"]);
+            h.Password(builder.Configuration["EventBusSettings:RabbitMQHostPassword"]);
+        });
+
+        config.ConfigureEndpoints(context);
+    });
+});
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -68,5 +95,25 @@ carEndpointGroup.MapDelete("/{userName}", async (string username, ICartRepositor
     return Results.NoContent();
 })
     .WithSummary("Deletes the cart for a certain username");
+
+carEndpointGroup.MapPost("/Checkout", async (CartCheckout cartCheckout, ICartRepository repo,
+    IPublishEndpoint publishEndpoint, CancellationToken ct) =>
+{
+    var cart = await repo.GetBasket(cartCheckout.UserName, ct).ConfigureAwait(false);
+
+    if (cart is null)
+    {
+        return Results.BadRequest();
+    }
+
+    var eventMessage = CartMapper.MapToEvent(cartCheckout);
+    eventMessage.TotalPrice = cart.TotalPrice;
+    await publishEndpoint.Publish(eventMessage, ct).ConfigureAwait(false);
+
+    await repo.DeleteBasket(cart.UserName!, ct).ConfigureAwait(false);
+
+    return Results.Accepted();
+})
+    .WithSummary("Checkout User Cart and Create new Order");
 
 app.Run();
