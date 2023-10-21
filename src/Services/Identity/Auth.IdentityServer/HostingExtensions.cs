@@ -1,9 +1,14 @@
+using Auth.IdentityServer.Data;
+using Auth.IdentityServer.Models;
 using Auth.IdentityServer.Pages.Admin.ApiScopes;
 using Auth.IdentityServer.Pages.Admin.Clients;
 using Auth.IdentityServer.Pages.Admin.IdentityScopes;
+using Auth.IdentityServer.ProfileServices;
 using Duende.IdentityServer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Logging;
 using Serilog;
 
 namespace Auth.IdentityServer;
@@ -15,6 +20,14 @@ internal static class HostingExtensions
         builder.Services.AddRazorPages();
 
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+        var migrationsAssemblyName = typeof(Program).Assembly.FullName;
+
+        builder.Services.AddDbContextPool<ApplicationDbContext>(options =>
+            options.UseSqlite(connectionString));
+
+        builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultTokenProviders();
 
         var isBuilder = builder.Services
             .AddIdentityServer(options =>
@@ -27,12 +40,11 @@ internal static class HostingExtensions
                 // see https://docs.duendesoftware.com/identityserver/v5/fundamentals/resources/
                 options.EmitStaticAudienceClaim = true;
             })
-            .AddTestUsers(TestUsers.Users)
             // this adds the config data from DB (clients, resources, CORS)
             .AddConfigurationStore(options =>
             {
                 options.ConfigureDbContext = b =>
-                    b.UseSqlite(connectionString, dbOpts => dbOpts.MigrationsAssembly(typeof(Program).Assembly.FullName));
+                    b.UseSqlite(connectionString, dbOpts => dbOpts.MigrationsAssembly(migrationsAssemblyName));
             })
             // this is something you will want in production to reduce load on and requests to the DB
             .AddConfigurationStoreCache()
@@ -41,8 +53,10 @@ internal static class HostingExtensions
             .AddOperationalStore(options =>
             {
                 options.ConfigureDbContext = b =>
-                    b.UseSqlite(connectionString, dbOpts => dbOpts.MigrationsAssembly(typeof(Program).Assembly.FullName));
-            });
+                    b.UseSqlite(connectionString, dbOpts => dbOpts.MigrationsAssembly(migrationsAssemblyName));
+            })
+            .AddAspNetIdentity<ApplicationUser>()
+            .AddProfileService<CustomProfileService>();
 
         builder.Services.AddAuthentication()
             .AddGoogle(options =>
@@ -89,6 +103,7 @@ internal static class HostingExtensions
 
         if (app.Environment.IsDevelopment())
         {
+            IdentityModelEventSource.ShowPII = true;
             app.UseDeveloperExceptionPage();
             SeedData.EnsureSeedData(app);
         }
