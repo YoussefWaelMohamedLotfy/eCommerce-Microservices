@@ -27,7 +27,7 @@ internal sealed partial class UpdateOrderCommandHandler : IRequestHandler<Update
             return null;
         }
 
-        orderToUpdate = OrderMapper.MapToOrder(request);
+        OrderMapper.MapToOrder(request, orderToUpdate);
         _dbContext.Update(orderToUpdate);
         await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
