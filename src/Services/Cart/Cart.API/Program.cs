@@ -3,13 +3,9 @@ using Cart.API.Mappings;
 using Cart.API.Repositories;
 using Cart.API.Services;
 using Discount.gRPC.Protos;
-
 using MassTransit;
-
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Serilog;
-
-using Shared.Utilites.EventBus.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -83,7 +79,7 @@ carEndpointGroup.MapPost("/", async (ShoppingCart updatedCart, DiscountGrpcServi
         var coupon = await discountService.GetDiscount(item.ProductName, ct).ConfigureAwait(false);
         item.Price -= coupon.Amount;
     }
-    
+
     return Results.Ok(await repo.UpdateBasket(updatedCart, ct).ConfigureAwait(false));
 })
     .WithSummary("Updates the cart for a certain username");

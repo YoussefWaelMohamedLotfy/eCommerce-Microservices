@@ -13,6 +13,9 @@
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
+# SQLite DB files
+*.db*
+
 # Mono auto generated files
 mono_crash.*
 
