@@ -56,13 +56,13 @@ public static partial class HostExtensions
 
     }
 
-    [LoggerMessage(Message = "Migrating PostgreSQL Database...", Level = LogLevel.Information, EventId = 0)]
+    [LoggerMessage(Message = "Migrating SQL Server Database...", Level = LogLevel.Information, EventId = 0)]
     public static partial void LogStartMigration(ILogger logger);
 
-    [LoggerMessage(Message = "Migrated PostgreSQL Database...", Level = LogLevel.Information, EventId = 1)]
+    [LoggerMessage(Message = "Migrated SQL Server Database...", Level = LogLevel.Information, EventId = 1)]
     public static partial void LogFinishMigration(ILogger logger);
 
-    [LoggerMessage(Message = "An error occurred while migrating the postresql database", Level = LogLevel.Error, EventId = 2)]
+    [LoggerMessage(Message = "An error occurred while migrating the SQL Server database", Level = LogLevel.Error, EventId = 2)]
     public static partial void LogMigrationError(ILogger logger, Exception ex);
 
     [LoggerMessage(Message = "Retry {attemptNumber}, due to: ", Level = LogLevel.Error, EventId = 3)]

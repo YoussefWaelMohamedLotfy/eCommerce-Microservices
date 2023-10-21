@@ -1,12 +1,11 @@
 using Catalog.API;
-
 using Discount.gRPC.Extensions;
-
+using MassTransit;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Ordering.API;
 using Ordering.Application;
 using Ordering.Infrastructure;
 using Ordering.Infrastructure.Persistence;
-
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +22,22 @@ builder.WebHost.ConfigureKestrel(options =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddApplicationServices()
     .AddInfrastructureServices(builder.Configuration);
+
+builder.Services.AddMassTransit(x =>
+{
+    x.AddConsumer<EventBusConsumer>();
+
+    x.UsingRabbitMq((context, config) =>
+    {
+        config.Host(builder.Configuration["EventBusSettings:RabbitMQHostAddress"], "/", h =>
+        {
+            h.Username(builder.Configuration["EventBusSettings:RabbitMQHostUsername"]);
+            h.Password(builder.Configuration["EventBusSettings:RabbitMQHostPassword"]);
+        });
+
+        config.ConfigureEndpoints(context);
+    });
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
