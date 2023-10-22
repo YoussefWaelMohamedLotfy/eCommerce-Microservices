@@ -12,6 +12,7 @@ public static class EndpointsExtension
     public static WebApplication MapEndpoints(this WebApplication app)
     {
         var orderingEndpointGroup = app.MapGroup("/api/v1/Orders")
+            .RequireAuthorization("ApiScope")
             .WithOpenApi();
 
         orderingEndpointGroup.MapGet("/{id}", async (int id, IMediator mediator, CancellationToken ct) =>

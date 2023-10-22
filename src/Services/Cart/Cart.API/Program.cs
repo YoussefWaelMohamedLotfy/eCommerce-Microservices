@@ -3,13 +3,17 @@ using Cart.API.Mappings;
 using Cart.API.Repositories;
 using Cart.API.Services;
 using Discount.gRPC.Protos;
-
 using MassTransit;
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using Shared.Utilites.Swagger;
 
-using Shared.Utilites.EventBus.Common;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +23,30 @@ builder.WebHost.ConfigureKestrel(options =>
 {
     options.ConfigureEndpointDefaults(o => o.Protocols = HttpProtocols.Http1AndHttp2AndHttp3);
     options.ConfigureHttpsDefaults(o => o.AllowAnyClientCertificate());
+});
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+    {
+        options.Authority = "https://localhost:5001";
+
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateAudience = true,
+            ValidateIssuer = true,
+            ValidAudience = builder.Configuration["JWT:ValidAudience"],
+            ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
+            ClockSkew = TimeSpan.Zero,
+        };
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("ApiScope", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("scope", "api1");
+    });
 });
 
 builder.Services.AddScoped<ICartRepository, CartRepository>();
@@ -52,6 +80,7 @@ builder.Services.AddMassTransit(x =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
 var app = builder.Build();
 
@@ -60,11 +89,15 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    IdentityModelEventSource.ShowPII = true;
 }
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
 
 var carEndpointGroup = app.MapGroup("/api/v1/Cart")
+    .RequireAuthorization("ApiScope")
     .WithOpenApi();
 
 carEndpointGroup.MapGet("/{username}", async (string username, ICartRepository repo, CancellationToken ct) =>
@@ -83,7 +116,7 @@ carEndpointGroup.MapPost("/", async (ShoppingCart updatedCart, DiscountGrpcServi
         var coupon = await discountService.GetDiscount(item.ProductName, ct).ConfigureAwait(false);
         item.Price -= coupon.Amount;
     }
-    
+
     return Results.Ok(await repo.UpdateBasket(updatedCart, ct).ConfigureAwait(false));
 })
     .WithSummary("Updates the cart for a certain username");
