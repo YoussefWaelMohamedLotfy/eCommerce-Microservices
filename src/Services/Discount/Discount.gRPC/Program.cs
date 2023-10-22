@@ -4,6 +4,7 @@ using Discount.gRPC.Extensions;
 using Discount.gRPC.Repositories;
 using Discount.gRPC.Services;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.IdentityModel.Tokens;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,14 +21,41 @@ builder.WebHost.ConfigureKestrel(options =>
 // For instructions on how to configure Kestrel and gRPC clients on macOS, visit https://go.microsoft.com/fwlink/?linkid=2099682
 
 // Add services to the container.
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer("Bearer", options =>
+    {
+        options.Authority = "https://localhost:5001";
+
+        options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
+
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateAudience = true,
+            ValidateIssuer = true,
+            ValidAudience = builder.Configuration["JWT:ValidAudience"],
+            ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
+            ClockSkew = TimeSpan.Zero,
+        };
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("ApiScope", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("scope", "api1");
+    });
+});
+
 builder.Services.AddScoped<IDiscountRepository, DiscountRepository>();
 builder.Services.AddSingleton<DiscountMapper>();
 
 builder.Services.AddGrpc()
-    .AddJsonTranscoding()
-    ;
+    .AddJsonTranscoding();
+
 builder.Services.AddGrpcReflection()
     .AddGrpcSwagger();
+
 builder.Services.AddSwaggerGen(c =>
 {
     string xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
@@ -47,8 +75,15 @@ if (app.Environment.IsDevelopment())
 }
 
 // Configure the HTTP request pipeline.
-app.MapGrpcService<DiscountService>();
-app.MapGrpcReflectionService();
-app.MapGet("/", () => "Communication with server is available as gRPC endpoints and REST API.");
+app.UseHttpsRedirection();
 
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapGrpcService<DiscountService>()
+    .RequireAuthorization("ApiScope");
+
+app.MapGrpcReflectionService();
+
+app.MapGet("/", () => "Communication with server is available as gRPC endpoints and REST API.");
 app.Run();
