@@ -1,7 +1,10 @@
 using Catalog.API;
 using Discount.gRPC.Extensions;
 using MassTransit;
+
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Ordering.API;
@@ -9,6 +12,10 @@ using Ordering.Application;
 using Ordering.Infrastructure;
 using Ordering.Infrastructure.Persistence;
 using Serilog;
+
+using Shared.Utilites.Swagger;
+
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,8 +27,8 @@ builder.WebHost.ConfigureKestrel(options =>
     options.ConfigureHttpsDefaults(o => o.AllowAnyClientCertificate());
 });
 
-builder.Services.AddAuthentication("Bearer")
-    .AddJwtBearer("Bearer", options =>
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
     {
         options.Authority = "https://localhost:5001";
 
@@ -29,6 +36,7 @@ builder.Services.AddAuthentication("Bearer")
         {
             ValidateAudience = true,
             ValidateIssuer = true,
+            ValidateLifetime = true,
             ValidAudience = builder.Configuration["JWT:ValidAudience"],
             ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
             ClockSkew = TimeSpan.Zero,
@@ -67,6 +75,7 @@ builder.Services.AddMassTransit(x =>
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
 var app = builder.Build();
 

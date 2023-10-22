@@ -3,9 +3,15 @@ using Discount.gRPC.Data;
 using Discount.gRPC.Extensions;
 using Discount.gRPC.Repositories;
 using Discount.gRPC.Services;
+
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using Shared.Utilites.Swagger;
+
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,8 +27,8 @@ builder.WebHost.ConfigureKestrel(options =>
 // For instructions on how to configure Kestrel and gRPC clients on macOS, visit https://go.microsoft.com/fwlink/?linkid=2099682
 
 // Add services to the container.
-builder.Services.AddAuthentication("Bearer")
-    .AddJwtBearer("Bearer", options =>
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
     {
         options.Authority = "https://localhost:5001";
 
@@ -63,6 +69,7 @@ builder.Services.AddSwaggerGen(c =>
     c.IncludeXmlComments(filePath);
     c.IncludeGrpcXmlComments(filePath, true);
 });
+builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
 var app = builder.Build();
 
