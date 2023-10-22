@@ -3,10 +3,13 @@ using Catalog.API.Repositories;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
+
+using Shared.Utilites.HealthChecks;
 using Shared.Utilites.Swagger;
 
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -51,6 +54,10 @@ builder.Services.AddScoped<ICatalogContext, CatalogContext>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
 builder.Services.AddOutputCache();
+
+builder.Services.AddHealthChecks()
+    .AddMongoDb(builder.Configuration["DatabaseSettings:ConnectionString"]!, "MongoDb Health", HealthStatus.Degraded)
+    .AddIdentityServer(new Uri(builder.Configuration["JWT:ValidIssuer"]!), name: "Duende IdentityServer Health", failureStatus: HealthStatus.Degraded);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -119,5 +126,7 @@ catalogEndpointGroup.MapDelete("/{id:length(24)}", async (string id, IProductRep
     return isDeleted ? Results.NoContent() : Results.NotFound();
 })
     .WithSummary("Deletes a product from catalog");
+
+app.MapCustomHealthChecks();
 
 app.Run();

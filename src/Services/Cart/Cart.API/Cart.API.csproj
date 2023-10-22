@@ -7,6 +7,9 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="AspNetCore.HealthChecks.OpenIdConnectServer" Version="7.0.0" />
+        <PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" Version="7.0.0" />
+        <PackageReference Include="AspNetCore.HealthChecks.Redis" Version="7.0.1" />
         <PackageReference Include="Grpc.AspNetCore" Version="2.58.0" />
         <PackageReference Include="MassTransit.RabbitMQ" Version="8.1.1" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.12" />

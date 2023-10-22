@@ -6,9 +6,12 @@ using Discount.gRPC.Services;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
+
+using Shared.Utilites.HealthChecks;
 using Shared.Utilites.Swagger;
 
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -56,6 +59,10 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddScoped<IDiscountRepository, DiscountRepository>();
 builder.Services.AddSingleton<DiscountMapper>();
 
+builder.Services.AddHealthChecks()
+    .AddNpgSql(builder.Configuration.GetConnectionString("DefaultConnection")!, name: "Postgres Health", failureStatus: HealthStatus.Degraded)
+    .AddIdentityServer(new Uri(builder.Configuration["JWT:ValidIssuer"]!), name: "Duende IdentityServer Health", failureStatus: HealthStatus.Degraded);
+
 builder.Services.AddGrpc()
     .AddJsonTranscoding();
 
@@ -93,4 +100,6 @@ app.MapGrpcService<DiscountService>()
 app.MapGrpcReflectionService();
 
 app.MapGet("/", () => "Communication with server is available as gRPC endpoints and REST API.");
+app.MapCustomHealthChecks();
+
 app.Run();
