@@ -22,7 +22,7 @@ builder.Services.AddReverseProxy()
             transforms.AddResponseTransform(transform =>
             {
                 var testvalue = "Test-Value";
-                transform.ProxyResponse.Headers.Add("X-YARP-Response-Id", testvalue);
+                transform.ProxyResponse?.Headers.Add("X-YARP-Response-Id", testvalue);
                 return ValueTask.CompletedTask;
             });
 
