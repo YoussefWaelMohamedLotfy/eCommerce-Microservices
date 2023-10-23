@@ -53,6 +53,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebStatus", "WebStatus", "{
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebStatus", "src\WebApps\WebStatus\WebStatus\WebStatus.csproj", "{9F9037C4-AB06-4F50-8329-1A40A3E92B18}"
 EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{D50FEF02-81E5-4AE6-A5EC-879C0EC62D42}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Gateways", "Gateways", "{CE41AD89-B287-4415-943B-FA54C2BE36C7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YARP.Proxy", "src\Gateways\YARP.Proxy\YARP.Proxy.csproj", "{3FBA4ED1-0371-4F1B-A636-0F625330094A}"
@@ -107,6 +109,10 @@ Global
 		{3FBA4ED1-0371-4F1B-A636-0F625330094A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3FBA4ED1-0371-4F1B-A636-0F625330094A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3FBA4ED1-0371-4F1B-A636-0F625330094A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D50FEF02-81E5-4AE6-A5EC-879C0EC62D42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D50FEF02-81E5-4AE6-A5EC-879C0EC62D42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D50FEF02-81E5-4AE6-A5EC-879C0EC62D42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D50FEF02-81E5-4AE6-A5EC-879C0EC62D42}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

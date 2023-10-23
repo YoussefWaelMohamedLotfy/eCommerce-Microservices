@@ -1,0 +1,43 @@
+version: '3.4'
+
+services:
+  cart.api:
+    image: ${DOCKER_REGISTRY-}cartapi
+    build:
+      context: .
+      dockerfile: src/Services/Cart/Cart.API/Dockerfile
+
+  catalog.api:
+    image: ${DOCKER_REGISTRY-}catalogapi
+    build:
+      context: .
+      dockerfile: src/Services/Catalog/Catalog.API/Dockerfile
+
+
+  discount.grpc:
+    image: ${DOCKER_REGISTRY-}discountgrpc
+    build:
+      context: .
+      dockerfile: src/Services/Discount/Discount.gRPC/Dockerfile
+
+
+  auth.identityserver:
+    image: ${DOCKER_REGISTRY-}authidentityserver
+    build:
+      context: .
+      dockerfile: src/Services/Identity/Auth.IdentityServer/Dockerfile
+
+
+  ordering.api:
+    image: ${DOCKER_REGISTRY-}orderingapi
+    build:
+      context: .
+      dockerfile: src/Services/Ordering/Ordering.API/Dockerfile
+
+
+  webstatus:
+    image: ${DOCKER_REGISTRY-}webstatus
+    build:
+      context: .
+      dockerfile: src/WebApps/WebStatus/WebStatus/Dockerfile
+
