@@ -4,7 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseSerilog(Serilogger.Configure);
 
-builder.Services.AddHealthChecksUI(x => x.AddHealthCheckEndpoint("IS", "https://localhost:5001/health"))
+builder.Services.AddHealthChecksUI(x => x.SetEvaluationTimeInSeconds(10))
     .AddInMemoryStorage();
 
 var app = builder.Build();
