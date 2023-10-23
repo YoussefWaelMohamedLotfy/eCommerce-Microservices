@@ -9,6 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="AspNetCore.HealthChecks.Elasticsearch" Version="7.0.0" />
         <PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="7.1.0" />
         <PackageReference Include="AspNetCore.HealthChecks.OpenIdConnectServer" Version="7.0.0" />
         <PackageReference Include="Dapper" Version="2.1.15" />

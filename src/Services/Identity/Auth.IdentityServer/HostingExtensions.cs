@@ -98,10 +98,11 @@ internal static class HostingExtensions
             options.Conventions.AuthorizeFolder("/ServerSideSessions", "admin"));
 
         builder.Services.AddHealthChecks()
-            .AddSqlite(builder.Configuration.GetConnectionString("DefaultConnection")!, name: "SQLite Health", failureStatus: HealthStatus.Degraded)
+            .AddSqlite(builder.Configuration.GetConnectionString("DefaultConnection")!, name: "SQLite Health", failureStatus: HealthStatus.Unhealthy)
             .AddDbContextCheck<ApplicationDbContext>("Application Identity EF Core Health", HealthStatus.Unhealthy)
             .AddDbContextCheck<ConfigurationDbContext>("IS Configuration EF Core Health", HealthStatus.Unhealthy)
-            .AddDbContextCheck<PersistedGrantDbContext>("IS Persisted Grant EF Core Health", HealthStatus.Unhealthy);
+            .AddDbContextCheck<PersistedGrantDbContext>("IS Persisted Grant EF Core Health", HealthStatus.Unhealthy)
+            .AddElasticsearch(builder.Configuration["Serilog:WriteTo:1:Args:nodeUris"]!, "Elasticsearch Health", HealthStatus.Degraded, timeout: TimeSpan.FromSeconds(2));
 
         return builder.Build();
     }

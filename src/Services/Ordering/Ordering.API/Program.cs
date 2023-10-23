@@ -1,7 +1,6 @@
 using Catalog.API;
 using Discount.gRPC.Extensions;
 using MassTransit;
-
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -13,10 +12,8 @@ using Ordering.Application;
 using Ordering.Infrastructure;
 using Ordering.Infrastructure.Persistence;
 using Serilog;
-
 using Shared.Utilites.HealthChecks;
 using Shared.Utilites.Swagger;
-
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -76,10 +73,11 @@ builder.Services.AddMassTransit(x =>
 });
 
 builder.Services.AddHealthChecks()
-    .AddSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")!, name: "SQL Server Health", failureStatus: HealthStatus.Degraded)
+    .AddSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")!, name: "SQL Server Health", failureStatus: HealthStatus.Unhealthy)
     .AddRabbitMQ(builder.Configuration["EventBusSettings:RabbitMQHealthCheckAddress"]!, name: "RabbitMQ Health", failureStatus: HealthStatus.Degraded)
-    .AddDbContextCheck<OrderingDbContext>("EF Core Health", HealthStatus.Degraded)
-    .AddIdentityServer(new Uri(builder.Configuration["JWT:ValidIssuer"]!), name: "Duende IdentityServer Health", failureStatus: HealthStatus.Degraded);
+    .AddDbContextCheck<OrderingDbContext>("EF Core Health", HealthStatus.Unhealthy)
+    .AddIdentityServer(new Uri(builder.Configuration["JWT:ValidIssuer"]!), name: "Duende IdentityServer Health", failureStatus: HealthStatus.Unhealthy)
+    .AddElasticsearch(builder.Configuration["Serilog:WriteTo:1:Args:nodeUris"]!, "Elasticsearch Health", HealthStatus.Degraded, timeout: TimeSpan.FromSeconds(2));
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

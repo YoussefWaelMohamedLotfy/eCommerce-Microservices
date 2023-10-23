@@ -77,9 +77,10 @@ builder.Services.AddMassTransit(x =>
 });
 
 builder.Services.AddHealthChecks()
-    .AddRedis(builder.Configuration.GetConnectionString("RedisConnection")!, "Redis Health", HealthStatus.Degraded)
+    .AddRedis(builder.Configuration.GetConnectionString("RedisConnection")!, "Redis Health", HealthStatus.Unhealthy, timeout: TimeSpan.FromSeconds(2))
     .AddRabbitMQ(builder.Configuration["EventBusSettings:RabbitMQHealthCheckAddress"]!, name: "RabbitMQ Health", failureStatus: HealthStatus.Degraded)
-    .AddIdentityServer(new Uri(builder.Configuration["JWT:ValidIssuer"]!), name: "Duende IdentityServer Health", failureStatus: HealthStatus.Degraded);
+    .AddIdentityServer(new Uri(builder.Configuration["JWT:ValidIssuer"]!), name: "Duende IdentityServer Health", failureStatus: HealthStatus.Unhealthy)
+    .AddElasticsearch(builder.Configuration["Serilog:WriteTo:1:Args:nodeUris"]!, "Elasticsearch Health", HealthStatus.Degraded, timeout: TimeSpan.FromSeconds(2));
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
