@@ -7,6 +7,9 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="AspNetCore.HealthChecks.OpenIdConnectServer" Version="7.0.0" />
+        <PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" Version="7.0.0" />
+        <PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="7.0.0" />
         <PackageReference Include="MassTransit.RabbitMQ" Version="8.1.1" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.12" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.12" />
@@ -14,6 +17,7 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="7.0.12" />
         <PackageReference Include="Polly" Version="8.0.0" />
 
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />

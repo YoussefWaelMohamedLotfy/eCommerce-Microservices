@@ -6,6 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="AspNetCore.HealthChecks.Sqlite" Version="7.0.0" />
         <PackageReference Include="Duende.IdentityServer.AspNetIdentity" Version="6.3.5" />
         <PackageReference Include="Duende.IdentityServer.EntityFramework" Version="6.3.5" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="7.0.12" />
@@ -16,6 +17,7 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build, native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="7.0.12" />
     </ItemGroup>
 
     <ItemGroup>

@@ -4,15 +4,15 @@ using Cart.API.Repositories;
 using Cart.API.Services;
 using Discount.gRPC.Protos;
 using MassTransit;
-
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using Shared.Utilites.HealthChecks;
 using Shared.Utilites.Swagger;
-
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -75,6 +75,11 @@ builder.Services.AddMassTransit(x =>
         config.ConfigureEndpoints(context);
     });
 });
+
+builder.Services.AddHealthChecks()
+    .AddRedis(builder.Configuration.GetConnectionString("RedisConnection")!, "Redis Health", HealthStatus.Degraded)
+    .AddRabbitMQ(builder.Configuration["EventBusSettings:RabbitMQHealthCheckAddress"]!, name: "RabbitMQ Health", failureStatus: HealthStatus.Degraded)
+    .AddIdentityServer(new Uri(builder.Configuration["JWT:ValidIssuer"]!), name: "Duende IdentityServer Health", failureStatus: HealthStatus.Degraded);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -148,5 +153,7 @@ carEndpointGroup.MapPost("/Checkout", async (CartCheckout cartCheckout, ICartRep
     return Results.Accepted();
 })
     .WithSummary("Checkout User Cart and Create new Order");
+
+app.MapCustomHealthChecks();
 
 app.Run();

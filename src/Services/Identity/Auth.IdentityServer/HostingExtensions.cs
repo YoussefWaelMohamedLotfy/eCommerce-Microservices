@@ -5,11 +5,14 @@ using Auth.IdentityServer.Pages.Admin.Clients;
 using Auth.IdentityServer.Pages.Admin.IdentityScopes;
 using Auth.IdentityServer.ProfileServices;
 using Duende.IdentityServer;
+using Duende.IdentityServer.EntityFramework.DbContexts;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Logging;
 using Serilog;
+using Shared.Utilites.HealthChecks;
 
 namespace Auth.IdentityServer;
 
@@ -94,6 +97,12 @@ internal static class HostingExtensions
         builder.Services.Configure<RazorPagesOptions>(options =>
             options.Conventions.AuthorizeFolder("/ServerSideSessions", "admin"));
 
+        builder.Services.AddHealthChecks()
+            .AddSqlite(builder.Configuration.GetConnectionString("DefaultConnection")!, name: "SQLite Health", failureStatus: HealthStatus.Degraded)
+            .AddDbContextCheck<ApplicationDbContext>("Application Identity EF Core Health", HealthStatus.Unhealthy)
+            .AddDbContextCheck<ConfigurationDbContext>("IS Configuration EF Core Health", HealthStatus.Unhealthy)
+            .AddDbContextCheck<PersistedGrantDbContext>("IS Persisted Grant EF Core Health", HealthStatus.Unhealthy);
+
         return builder.Build();
     }
 
@@ -115,6 +124,8 @@ internal static class HostingExtensions
 
         app.MapRazorPages()
             .RequireAuthorization();
+
+        app.MapCustomHealthChecks();
 
         return app;
     }

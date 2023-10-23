@@ -4,6 +4,7 @@ using MassTransit;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -13,6 +14,7 @@ using Ordering.Infrastructure;
 using Ordering.Infrastructure.Persistence;
 using Serilog;
 
+using Shared.Utilites.HealthChecks;
 using Shared.Utilites.Swagger;
 
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -73,6 +75,12 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
+builder.Services.AddHealthChecks()
+    .AddSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")!, name: "SQL Server Health", failureStatus: HealthStatus.Degraded)
+    .AddRabbitMQ(builder.Configuration["EventBusSettings:RabbitMQHealthCheckAddress"]!, name: "RabbitMQ Health", failureStatus: HealthStatus.Degraded)
+    .AddDbContextCheck<OrderingDbContext>("EF Core Health", HealthStatus.Degraded)
+    .AddIdentityServer(new Uri(builder.Configuration["JWT:ValidIssuer"]!), name: "Duende IdentityServer Health", failureStatus: HealthStatus.Degraded);
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
@@ -94,4 +102,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapEndpoints();
+app.MapCustomHealthChecks();
+
 app.Run();
