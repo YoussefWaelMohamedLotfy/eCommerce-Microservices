@@ -3,17 +3,14 @@ using Discount.gRPC.Data;
 using Discount.gRPC.Extensions;
 using Discount.gRPC.Repositories;
 using Discount.gRPC.Services;
-
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
-
 using Shared.Utilites.HealthChecks;
 using Shared.Utilites.Swagger;
-
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -60,8 +57,9 @@ builder.Services.AddScoped<IDiscountRepository, DiscountRepository>();
 builder.Services.AddSingleton<DiscountMapper>();
 
 builder.Services.AddHealthChecks()
-    .AddNpgSql(builder.Configuration.GetConnectionString("DefaultConnection")!, name: "Postgres Health", failureStatus: HealthStatus.Degraded)
-    .AddIdentityServer(new Uri(builder.Configuration["JWT:ValidIssuer"]!), name: "Duende IdentityServer Health", failureStatus: HealthStatus.Degraded);
+    .AddNpgSql(builder.Configuration.GetConnectionString("DefaultConnection")!, name: "Postgres Health", failureStatus: HealthStatus.Unhealthy)
+    .AddIdentityServer(new Uri(builder.Configuration["JWT:ValidIssuer"]!), name: "Duende IdentityServer Health", failureStatus: HealthStatus.Degraded)
+    .AddElasticsearch(builder.Configuration["Serilog:WriteTo:1:Args:nodeUris"]!, "Elasticsearch Health", HealthStatus.Degraded, timeout: TimeSpan.FromSeconds(2));
 
 builder.Services.AddGrpc()
     .AddJsonTranscoding();

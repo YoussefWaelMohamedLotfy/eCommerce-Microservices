@@ -6,6 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="AspNetCore.HealthChecks.Elasticsearch" Version="7.0.0" />
         <PackageReference Include="AspNetCore.HealthChecks.Sqlite" Version="7.0.0" />
         <PackageReference Include="Duende.IdentityServer.AspNetIdentity" Version="6.3.5" />
         <PackageReference Include="Duende.IdentityServer.EntityFramework" Version="6.3.5" />
