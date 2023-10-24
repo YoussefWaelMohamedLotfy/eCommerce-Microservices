@@ -1,6 +1,24 @@
 version: '3.9'
 
 services:
+  catalogdb:
+    image: mongo
+
+  cartdb:
+    image: redis:alpine
+
+  discountdb:
+    image: postgres:alpine
+
+  orderdb:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+
+  rabbitmq:
+    image: rabbitmq:management-alpine
+
+  pgadmin:
+    image: dpage/pgadmin4
+
   cart.api:
     image: ${DOCKER_REGISTRY-}cartapi
     build:
@@ -19,7 +37,7 @@ services:
       context: .
       dockerfile: src/Services/Discount/Discount.gRPC/Dockerfile
 
-  auth.identityserver:
+  identityserver:
     image: ${DOCKER_REGISTRY-}authidentityserver
     build:
       context: .
@@ -43,3 +61,15 @@ services:
       context: .
       dockerfile: src/Gateways/YARP.Proxy/Dockerfile
 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.10.4
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.10.4
+
+volumes:
+  mongo_data:
+  portainer_data:
+  postgres_data:
+  pgadmin_data:
+  elasticsearch-data:
