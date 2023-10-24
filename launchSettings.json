@@ -9,7 +9,8 @@
         "discount.grpc": "StartDebugging",
         "auth.identityserver": "StartDebugging",
         "ordering.api": "StartDebugging",
-        "webstatus": "StartDebugging"
+        "webstatus": "StartDebugging",
+        "yarp.proxy": "StartDebugging"
       }
     }
   }

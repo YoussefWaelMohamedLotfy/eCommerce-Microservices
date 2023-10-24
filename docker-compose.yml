@@ -1,4 +1,4 @@
-version: '3.4'
+version: '3.9'
 
 services:
   cart.api:
@@ -13,13 +13,11 @@ services:
       context: .
       dockerfile: src/Services/Catalog/Catalog.API/Dockerfile
 
-
   discount.grpc:
     image: ${DOCKER_REGISTRY-}discountgrpc
     build:
       context: .
       dockerfile: src/Services/Discount/Discount.gRPC/Dockerfile
-
 
   auth.identityserver:
     image: ${DOCKER_REGISTRY-}authidentityserver
@@ -27,17 +25,21 @@ services:
       context: .
       dockerfile: src/Services/Identity/Auth.IdentityServer/Dockerfile
 
-
   ordering.api:
     image: ${DOCKER_REGISTRY-}orderingapi
     build:
       context: .
       dockerfile: src/Services/Ordering/Ordering.API/Dockerfile
 
-
   webstatus:
     image: ${DOCKER_REGISTRY-}webstatus
     build:
       context: .
       dockerfile: src/WebApps/WebStatus/WebStatus/Dockerfile
+
+  yarp.proxy:
+    image: ${DOCKER_REGISTRY-}yarpproxy
+    build:
+      context: .
+      dockerfile: src/Gateways/YARP.Proxy/Dockerfile
 
