@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Serilog;
 using Shared.Utilites.HealthChecks;
 using Yarp.ReverseProxy.Transforms;
@@ -13,7 +14,8 @@ builder.WebHost.ConfigureKestrel(options =>
     options.ConfigureHttpsDefaults(o => o.AllowAnyClientCertificate());
 });
 
-builder.Services.AddHealthChecks();
+builder.Services.AddHealthChecks()
+    .AddElasticsearch(builder.Configuration["Serilog:WriteTo:1:Args:nodeUris"]!, "Elasticsearch Health", HealthStatus.Degraded, timeout: TimeSpan.FromSeconds(2));
 
 builder.Services.AddReverseProxy()
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"))

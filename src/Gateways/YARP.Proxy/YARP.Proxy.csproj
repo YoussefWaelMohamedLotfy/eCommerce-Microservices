@@ -7,6 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspNetCore.HealthChecks.Elasticsearch" Version="7.0.0" />
+    <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="7.0.0" />
     <PackageReference Include="Yarp.ReverseProxy" Version="2.0.1" />
   </ItemGroup>
 
