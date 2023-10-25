@@ -95,7 +95,6 @@ if (app.Environment.IsDevelopment())
     app.MigrateDatabase<OrderingDbContext>();
 }
 
-app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 

@@ -37,7 +37,7 @@ services:
         - 1433:1433
 
   rabbitmq:
-    container_name: rabbitmq
+    container_name: RabbitMQ
     restart: always
     ports:
         - 5672:5672
@@ -45,27 +45,28 @@ services:
 
   cart.api:
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=DockerDevelopment
       - ASPNETCORE_URLS=https://+:443;http://+:80
     ports:
       - 5137:80
-      - 7154:443
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      # - 7154:443
+    # volumes:
+    #   - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+    #   - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
     depends_on:
       - cartdb
+      - rabbitmq
 
   catalog.api:
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_ENVIRONMENT=DockerDevelopment
+      # - ASPNETCORE_URLS=https://+:443;http://+:80
     ports:
       - 5079:80
-      - 7206:443
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      # - 7206:443
+    # volumes:
+    #   - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+    #   - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
     depends_on:
       - catalogdb
 
@@ -86,62 +87,63 @@ services:
 
   discount.grpc:
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_ENVIRONMENT=DockerDevelopment
+      # - ASPNETCORE_URLS=https://+:443;http://+:80
     ports:
       - 5126:80
-      - 7109:443
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      # - 7109:443
+    # volumes:
+    #   - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+    #   - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
     depends_on:
       - discountdb
 
   identityserver:
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_ENVIRONMENT=DockerDevelopment
+      # - ASPNETCORE_URLS=https://+:443;http://+:80
     ports:
       - 5002:80
-      - 5001:443
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      # - 5001:443
+    # volumes:
+    #   - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+    #   - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
 
   ordering.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=DockerDevelopment
-      - ASPNETCORE_URLS=https://+:443;http://+:80
+      # - ASPNETCORE_URLS=https://+:443;http://+:80
     ports:
       - 5158:80
-      - 7133:443
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      # - 7133:443
+    # volumes:
+    #   - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+    #   - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
     depends_on:
       - orderdb
+      - rabbitmq
 
   webstatus:
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_ENVIRONMENT=DockerDevelopment
+      # - ASPNETCORE_URLS=https://+:443;http://+:80
     ports:
       - 5013:80
-      - 7153:443
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      # - 7153:443
+    # volumes:
+    #   - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+    #   - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
 
   yarp.proxy:
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_ENVIRONMENT=DockerDevelopment
+      # - ASPNETCORE_URLS=https://+:443;http://+:80
     ports:
       - 5154:80
-      - 7038:443
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      # - 7038:443
+    # volumes:
+    #   - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+    #   - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
 
   elasticsearch:
     container_name: elasticsearch

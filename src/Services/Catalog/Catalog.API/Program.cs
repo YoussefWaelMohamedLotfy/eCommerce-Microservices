@@ -73,8 +73,6 @@ if (app.Environment.IsDevelopment())
     IdentityModelEventSource.ShowPII = true;
 }
 
-app.UseHttpsRedirection();
-
 app.UseOutputCache();
 app.UseAuthentication();
 app.UseAuthorization();
