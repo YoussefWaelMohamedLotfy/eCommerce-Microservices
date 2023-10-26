@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Shared.Utilites.HealthChecks;
@@ -30,9 +31,9 @@ builder.WebHost.ConfigureKestrel(options =>
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
     {
-        options.Authority = "https://localhost:5001";
+        options.Authority = builder.Configuration["JWT:ValidIssuer"];
 
-        options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
+        options.RequireHttpsMetadata = builder.Environment.IsProduction();
 
         options.TokenValidationParameters = new TokenValidationParameters
         {
@@ -78,10 +79,11 @@ builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwa
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDevelopment"))
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    IdentityModelEventSource.ShowPII = true;
 
     app.MigrateDatabase<Program>();
 }
