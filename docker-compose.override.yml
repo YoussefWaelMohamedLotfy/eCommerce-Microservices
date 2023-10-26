@@ -23,7 +23,7 @@ services:
       - POSTGRES_DB=DiscountDb
     restart: always
     ports:
-        - "5432:5432"
+        - 5432:5432
     volumes:
       - postgres_data:/var/lib/postgresql/data/
 
@@ -164,3 +164,35 @@ services:
         - elasticsearch
     ports:
         - 5601:5601
+
+  keycloak:
+    container_name: KeyCloak
+    ports:
+      - 8080:8080
+    restart: always
+    depends_on:
+      - postgresdb
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_HOSTNAME=keycloak-eCommerce
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://postgresdb:5433/keycloak
+      - KC_DB_PORT=5433
+      - KC_DB_DATABASE=keycloak
+      - KC_DB_USERNAME=admin
+      - KC_DB_PASSWORD=admin1234
+      - TZ=Africa/Cairo
+    command: start-dev 
+
+  postgresdb:
+    container_name: KeyCloakDb
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin1234
+      - POSTGRES_DB=keycloak
+    restart: always
+    ports:
+        - 5433:5432
+    volumes:
+      - postgreskeycloak_data:/var/lib/postgresql/data/

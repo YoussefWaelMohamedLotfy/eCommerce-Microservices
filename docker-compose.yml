@@ -67,9 +67,16 @@ services:
   kibana:
     image: docker.elastic.co/kibana/kibana:8.10.4
 
+  keycloak:
+    image: quay.io/keycloak/keycloak
+
+  postgresdb:
+    image: postgres:alpine
+
 volumes:
   mongo_data:
   portainer_data:
   postgres_data:
   pgadmin_data:
   elasticsearch-data:
+  postgreskeycloak_data:
