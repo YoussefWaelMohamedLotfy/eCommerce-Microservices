@@ -131,7 +131,7 @@ public static class Config
                     "https://localhost:7206/swagger/oauth2-redirect.html", // Catalog API
                 },
                 AllowedCorsOrigins =
-                                {
+                {
                     "https://localhost:7133", // Ordering API
                     "https://localhost:7154", // Cart API
                     "https://localhost:7109", // Discount API
