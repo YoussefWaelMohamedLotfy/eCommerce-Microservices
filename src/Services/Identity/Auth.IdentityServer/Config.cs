@@ -116,6 +116,22 @@ public static class Config
                     "api1",
                     "color"
                 }
-            }
+            },
+            new Client
+            {
+                ClientId = "api-swagger",
+                RequireClientSecret = false,
+                AllowedGrantTypes = GrantTypes.Code,
+                RequirePkce = true,
+                RedirectUris = { "https://localhost:7133/swagger/oauth2-redirect.html" }, // Ordering API
+                AllowedCorsOrigins = { "https://localhost:7133" },
+                AllowOfflineAccess = true,
+                AllowedScopes = 
+                {
+                    IdentityServerConstants.StandardScopes.OpenId,
+                    IdentityServerConstants.StandardScopes.Profile,
+                    "api1"
+                }
+            },
         };
 }

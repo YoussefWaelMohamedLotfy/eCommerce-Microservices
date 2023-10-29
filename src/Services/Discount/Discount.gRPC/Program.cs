@@ -100,18 +100,7 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(o =>
-    {
-        var descriptions = app.DescribeApiVersions();
-
-        foreach (var description in descriptions)
-        {
-            var url = $"/swagger/{description.GroupName}/swagger.json";
-            o.SwaggerEndpoint(url, description.GroupName.ToUpperInvariant());
-        }
-    });
-
+    app.MapSwaggerMiddleware();
     app.MigrateDatabase<Program>();
 }
 

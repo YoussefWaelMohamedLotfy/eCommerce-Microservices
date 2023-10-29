@@ -1,5 +1,4 @@
 using Asp.Versioning;
-
 using Catalog.API;
 using Catalog.API.Data;
 using Catalog.API.Repositories;
@@ -88,17 +87,7 @@ app.MapEndpoints();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(o =>
-    {
-        var descriptions = app.DescribeApiVersions();
-
-        foreach (var description in descriptions)
-        {
-            var url = $"/swagger/{description.GroupName}/swagger.json";
-            o.SwaggerEndpoint(url, description.GroupName.ToUpperInvariant());
-        }
-    });
+    app.MapSwaggerMiddleware();
     IdentityModelEventSource.ShowPII = true;
 }
 
