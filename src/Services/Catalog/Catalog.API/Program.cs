@@ -1,3 +1,6 @@
+using Asp.Versioning;
+
+using Catalog.API;
 using Catalog.API.Data;
 using Catalog.API.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -60,16 +63,42 @@ builder.Services.AddHealthChecks()
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+builder.Services.AddSwaggerGen(o => o.OperationFilter<SwaggerDefaultValues>());
+
+builder.Services.AddApiVersioning(o =>
+{
+    o.DefaultApiVersion = new(1, 0);
+    o.AssumeDefaultVersionWhenUnspecified = true;
+    o.ApiVersionReader = ApiVersionReader.Combine(
+            new QueryStringApiVersionReader(),
+            new UrlSegmentApiVersionReader()
+        );
+    o.ReportApiVersions = true;
+}).AddApiExplorer(o =>
+{
+    o.GroupNameFormat = "'v'VVV";
+    o.SubstituteApiVersionInUrl = true;
+});
 
 var app = builder.Build();
+
+app.MapEndpoints();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(o =>
+    {
+        var descriptions = app.DescribeApiVersions();
+
+        foreach (var description in descriptions)
+        {
+            var url = $"/swagger/{description.GroupName}/swagger.json";
+            o.SwaggerEndpoint(url, description.GroupName.ToUpperInvariant());
+        }
+    });
     IdentityModelEventSource.ShowPII = true;
 }
 
@@ -78,52 +107,6 @@ app.UseHttpsRedirection();
 app.UseOutputCache();
 app.UseAuthentication();
 app.UseAuthorization();
-
-var catalogEndpointGroup = app.MapGroup("/api/v1/Catalog")
-    .RequireAuthorization("ApiScope")
-    .WithOpenApi();
-
-catalogEndpointGroup.MapGet("/", async (IProductRepository repo, CancellationToken ct) =>
-{
-    var products = await repo.GetProducts(ct).ConfigureAwait(false);
-    return Results.Ok(products);
-})
-    .WithSummary("Get all products");
-
-catalogEndpointGroup.MapGet("/{id:length(24)}", async (string id, IProductRepository repo, CancellationToken ct) =>
-{
-    var product = await repo.GetProduct(id, ct).ConfigureAwait(false);
-    return Results.Ok(product);
-})
-    .CacheOutput()
-    .WithName("GetProduct")
-    .WithSummary("Get product with an ID");
-
-catalogEndpointGroup.MapGet("/Category/{category}", async (string category, IProductRepository repo,
-    CancellationToken ct) =>
-{
-    var products = await repo.GetProductByCategory(category, ct).ConfigureAwait(false);
-    return Results.Ok(products);
-})
-    .WithSummary("Get products for a category");
-
-catalogEndpointGroup.MapPost("/", async (Product newProduct, IProductRepository repo, CancellationToken ct) =>
-{
-    await repo.CreateProduct(newProduct, ct).ConfigureAwait(false);
-    return Results.CreatedAtRoute("GetProduct", new { id = newProduct.Id }, newProduct);
-})
-    .WithSummary("Creates a new product in catalog");
-
-catalogEndpointGroup.MapPut("/", async (Product updatedProduct, IProductRepository repo, CancellationToken ct)
-    => Results.Ok(await repo.UpdateProduct(updatedProduct, ct).ConfigureAwait(false)))
-    .WithSummary("Updates existing product in catalog");
-
-catalogEndpointGroup.MapDelete("/{id:length(24)}", async (string id, IProductRepository repo, CancellationToken ct) =>
-{
-    var isDeleted = await repo.DeleteProduct(id, ct).ConfigureAwait(false);
-    return isDeleted ? Results.NoContent() : Results.NotFound();
-})
-    .WithSummary("Deletes a product from catalog");
 
 app.MapCustomHealthChecks();
 

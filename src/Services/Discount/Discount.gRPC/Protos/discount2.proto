@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+option csharp_namespace = "Discount.gRPC.Protos";
+import "google/api/annotations.proto";
+
+package discount.v2;
+
+service DiscountProtoServiceV2 {
+	// Get Discount by Product name in V2
+	rpc GetDiscount (GetDiscountRequestV2) returns (EchoMessage) {
+		option(google.api.http) = {
+			get: "/api/v2/Discount/{productName}"
+		};
+	}
+}
+
+message GetDiscountRequestV2 {
+	string productName = 1;	
+}
+
+message EchoMessage {
+	string productNameEcho = 1;	
+}
