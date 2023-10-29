@@ -1,12 +1,9 @@
-using System;
-
 using Asp.Versioning;
 using Catalog.API;
 using Discount.gRPC.Extensions;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Logging;
@@ -109,17 +106,7 @@ app.MapEndpoints();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(o =>
-    {
-        var descriptions = app.DescribeApiVersions();
-
-        foreach (var description in descriptions)
-        {
-            var url = $"/swagger/{description.GroupName}/swagger.json";
-            o.SwaggerEndpoint(url, description.GroupName.ToUpperInvariant());
-        }
-    });
+    app.MapSwaggerMiddleware();
     IdentityModelEventSource.ShowPII = true;
 
     app.MigrateDatabase<OrderingDbContext>();
