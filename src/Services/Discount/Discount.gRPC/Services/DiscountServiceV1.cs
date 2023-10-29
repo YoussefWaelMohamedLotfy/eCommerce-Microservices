@@ -5,13 +5,13 @@ using Grpc.Core;
 
 namespace Discount.gRPC.Services;
 
-public sealed class DiscountService : DiscountProtoService.DiscountProtoServiceBase
+public sealed class DiscountServiceV1 : DiscountProtoServiceV1.DiscountProtoServiceV1Base
 {
     private readonly IDiscountRepository _repository;
     private readonly DiscountMapper _mapper;
-    private readonly ILogger<DiscountService> _logger;
+    private readonly ILogger<DiscountServiceV1> _logger;
 
-    public DiscountService(IDiscountRepository repository, ILogger<DiscountService> logger, DiscountMapper mapper)
+    public DiscountServiceV1(IDiscountRepository repository, ILogger<DiscountServiceV1> logger, DiscountMapper mapper)
     {
         _repository = repository;
         _logger = logger;

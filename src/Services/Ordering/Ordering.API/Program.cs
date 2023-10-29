@@ -1,8 +1,12 @@
+using System;
+
+using Asp.Versioning;
 using Catalog.API;
 using Discount.gRPC.Extensions;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Logging;
@@ -80,16 +84,42 @@ builder.Services.AddHealthChecks()
     .AddElasticsearch(builder.Configuration["Serilog:WriteTo:1:Args:nodeUris"]!, "Elasticsearch Health", HealthStatus.Degraded, timeout: TimeSpan.FromSeconds(2));
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+builder.Services.AddSwaggerGen(o => o.OperationFilter<SwaggerDefaultValues>());
+
+builder.Services.AddApiVersioning(o =>
+{
+    o.DefaultApiVersion = new(1, 0);
+    o.AssumeDefaultVersionWhenUnspecified = true;
+    o.ApiVersionReader = ApiVersionReader.Combine(
+            new QueryStringApiVersionReader(),
+            new UrlSegmentApiVersionReader()
+        );
+    o.ReportApiVersions = true;
+}).AddApiExplorer(o =>
+{
+    o.GroupNameFormat = "'v'VVV";
+    o.SubstituteApiVersionInUrl = true;
+});
 
 var app = builder.Build();
+
+app.MapEndpoints();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(o =>
+    {
+        var descriptions = app.DescribeApiVersions();
+
+        foreach (var description in descriptions)
+        {
+            var url = $"/swagger/{description.GroupName}/swagger.json";
+            o.SwaggerEndpoint(url, description.GroupName.ToUpperInvariant());
+        }
+    });
     IdentityModelEventSource.ShowPII = true;
 
     app.MigrateDatabase<OrderingDbContext>();
@@ -99,7 +129,6 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapEndpoints();
 app.MapCustomHealthChecks();
 
 app.Run();

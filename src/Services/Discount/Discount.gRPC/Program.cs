@@ -1,4 +1,6 @@
 using System.Reflection;
+using Asp.Versioning;
+
 using Discount.gRPC.Data;
 using Discount.gRPC.Extensions;
 using Discount.gRPC.Repositories;
@@ -67,21 +69,48 @@ builder.Services.AddGrpc()
 builder.Services.AddGrpcReflection()
     .AddGrpcSwagger();
 
-builder.Services.AddSwaggerGen(c =>
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+builder.Services.AddSwaggerGen(o =>
 {
     string xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var filePath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    c.IncludeXmlComments(filePath);
-    c.IncludeGrpcXmlComments(filePath, true);
+    o.IncludeXmlComments(filePath);
+    o.IncludeGrpcXmlComments(filePath, true);
+
+    o.OperationFilter<SwaggerDefaultValues>();
 });
-builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+
+builder.Services.AddApiVersioning(o =>
+{
+    o.DefaultApiVersion = new(1, 0);
+    o.AssumeDefaultVersionWhenUnspecified = true;
+    o.ApiVersionReader = ApiVersionReader.Combine(
+            new QueryStringApiVersionReader(),
+            new UrlSegmentApiVersionReader()
+        );
+    o.ReportApiVersions = true;
+}).AddApiExplorer(o =>
+{
+    o.GroupNameFormat = "'v'VVV";
+    o.SubstituteApiVersionInUrl = true;
+});
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(o =>
+    {
+        var descriptions = app.DescribeApiVersions();
+
+        foreach (var description in descriptions)
+        {
+            var url = $"/swagger/{description.GroupName}/swagger.json";
+            o.SwaggerEndpoint(url, description.GroupName.ToUpperInvariant());
+        }
+    });
 
     app.MigrateDatabase<Program>();
 }
@@ -92,12 +121,12 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGrpcService<DiscountService>()
+app.MapGrpcService<DiscountServiceV1>()
     .RequireAuthorization("ApiScope");
 
-app.MapGrpcReflectionService();
+app.MapGrpcService<DiscountServiceV2>();
 
-app.MapGet("/", () => "Communication with server is available as gRPC endpoints and REST API.");
+app.MapGrpcReflectionService();
 app.MapCustomHealthChecks();
 
 app.Run();

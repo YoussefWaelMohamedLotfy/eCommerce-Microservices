@@ -11,12 +11,22 @@ public static class EndpointsExtension
 {
     public static WebApplication MapEndpoints(this WebApplication app)
     {
-        var orderingEndpointGroup = app.MapGroup("/api/v1/Orders")
+        var versionSet = app.NewVersionedApi("Orders");
+
+        var orderingEndpointGroup = versionSet.MapGroup("/api/v{version:apiVersion}/Orders")
+            .HasApiVersion(1)
             .RequireAuthorization("ApiScope")
             .WithOpenApi();
 
-        orderingEndpointGroup.MapGet("/{id}", async (int id, IMediator mediator, CancellationToken ct) =>
+        var orderingEndpointGroup2 = versionSet.MapGroup("/api/v{version:apiVersion}/Orders")
+            .HasApiVersion(2);
+
+        orderingEndpointGroup2.MapGet("/{id}", (int id) => $"Are you looking for ID {id} in V2?")
+            .MapToApiVersion(2);
+
+        orderingEndpointGroup.MapGet("/{id}", async (int id, HttpContext context, IMediator mediator, CancellationToken ct) =>
         {
+            Console.WriteLine($"Requested API Version: {context.GetRequestedApiVersion()}");
             var order = await mediator.Send(new GetOrderByIdQuery(id), ct).ConfigureAwait(false);
             return order is null ? Results.NotFound() : Results.Ok(order);
         })
