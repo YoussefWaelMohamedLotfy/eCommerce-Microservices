@@ -26,9 +26,9 @@ builder.WebHost.ConfigureKestrel(options =>
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
     {
-        options.Authority = "https://localhost:5001";
+        options.Authority = builder.Configuration["JWT:ValidIssuer"];
 
-        options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
+        options.RequireHttpsMetadata = builder.Environment.IsProduction();
 
         options.TokenValidationParameters = new TokenValidationParameters
         {
@@ -85,13 +85,11 @@ var app = builder.Build();
 app.MapEndpoints();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDevelopment"))
 {
     app.MapSwaggerMiddleware();
     IdentityModelEventSource.ShowPII = true;
 }
-
-app.UseHttpsRedirection();
 
 app.UseOutputCache();
 app.UseAuthentication();

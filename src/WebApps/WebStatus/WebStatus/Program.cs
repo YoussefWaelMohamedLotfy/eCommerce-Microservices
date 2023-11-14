@@ -16,8 +16,6 @@ builder.Services.AddHealthChecksUI(x => x.SetEvaluationTimeInSeconds(10))
 
 var app = builder.Build();
 
-app.UseHttpsRedirection();
-
 app.MapHealthChecksUI();
 
 app.Run();

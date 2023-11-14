@@ -1,6 +1,5 @@
 ﻿using Duende.IdentityServer;
 using Duende.IdentityServer.Models;
-
 using IdentityModel;
 
 namespace Auth.IdentityServer;
@@ -76,10 +75,18 @@ public static class Config
                 AllowedGrantTypes = GrantTypes.Code,
             
                 // where to redirect to after login
-                RedirectUris = { "https://localhost:5002/signin-oidc" },
+                RedirectUris =
+                {
+                    "https://localhost:7206/signin-oidc",
+                    "http://localhost:5079/signin-oidc"
+                },
 
                 // where to redirect to after logout
-                PostLogoutRedirectUris = { "https://localhost:5002/signout-callback-oidc" },
+                PostLogoutRedirectUris =
+                {
+                    "https://localhost:5001/signout-callback-oidc",
+                    "http://localhost:5002/signout-callback-oidc"
+                },
 
                 AllowOfflineAccess = true,
                 AllowedScopes = new List<string>
