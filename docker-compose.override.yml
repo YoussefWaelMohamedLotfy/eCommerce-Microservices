@@ -46,7 +46,7 @@ services:
   cart.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=DockerDevelopment
-      - ASPNETCORE_URLS=https://+:443;http://+:80
+      # - ASPNETCORE_URLS=https://+:443;http://+:80
     ports:
       - 5137:80
       # - 7154:443
@@ -177,10 +177,10 @@ services:
     environment:
       - KEYCLOAK_ADMIN=admin
       - KEYCLOAK_ADMIN_PASSWORD=admin
-      - KC_HOSTNAME=keycloak-eCommerce
+      - KC_HOSTNAME=localhost
       - KC_DB=postgres
-      - KC_DB_URL=jdbc:postgresql://postgresdb:5433/keycloak
-      - KC_DB_PORT=5433
+      - KC_DB_URL=jdbc:postgresql://postgresdb:5432/keycloak
+      - KC_DB_PORT=5432
       - KC_DB_DATABASE=keycloak
       - KC_DB_USERNAME=admin
       - KC_DB_PASSWORD=admin1234

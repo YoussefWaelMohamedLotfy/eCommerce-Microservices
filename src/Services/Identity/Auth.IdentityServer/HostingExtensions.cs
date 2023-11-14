@@ -111,7 +111,7 @@ internal static class HostingExtensions
     {
         app.UseSerilogRequestLogging();
 
-        if (app.Environment.IsDevelopment())
+        if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDevelopment"))
         {
             IdentityModelEventSource.ShowPII = true;
             app.UseDeveloperExceptionPage();

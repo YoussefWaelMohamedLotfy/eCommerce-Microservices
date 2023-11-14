@@ -12,8 +12,8 @@
     <ItemGroup>
         <PackageReference Include="AspNetCore.HealthChecks.Elasticsearch" Version="7.0.0" />
         <PackageReference Include="AspNetCore.HealthChecks.Sqlite" Version="7.0.0" />
-        <PackageReference Include="Duende.IdentityServer.AspNetIdentity" Version="6.3.5" />
-        <PackageReference Include="Duende.IdentityServer.EntityFramework" Version="6.3.5" />
+        <PackageReference Include="Duende.IdentityServer.AspNetIdentity" Version="6.3.6" />
+        <PackageReference Include="Duende.IdentityServer.EntityFramework" Version="6.3.6" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="7.0.12" />
         <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="7.0.12" />
         <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.12" />
