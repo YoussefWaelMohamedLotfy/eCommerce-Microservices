@@ -123,6 +123,34 @@ public static class Config
                     "api1",
                     "color"
                 }
-            }
+            },
+            new Client
+            {
+                ClientId = "api-swagger",
+                RequireClientSecret = false,
+                AllowedGrantTypes = GrantTypes.Code,
+                RequirePkce = true,
+                RedirectUris =
+                {
+                    "https://localhost:7133/swagger/oauth2-redirect.html", // Ordering API
+                    "https://localhost:7154/swagger/oauth2-redirect.html", // Cart API
+                    "https://localhost:7109/swagger/oauth2-redirect.html", // Discount API
+                    "https://localhost:7206/swagger/oauth2-redirect.html", // Catalog API
+                },
+                AllowedCorsOrigins =
+                {
+                    "https://localhost:7133", // Ordering API
+                    "https://localhost:7154", // Cart API
+                    "https://localhost:7109", // Discount API
+                    "https://localhost:7206", // Catalog API
+                },
+                AllowOfflineAccess = true,
+                AllowedScopes = 
+                {
+                    IdentityServerConstants.StandardScopes.OpenId,
+                    IdentityServerConstants.StandardScopes.Profile,
+                    "api1"
+                }
+            },
         };
 }
