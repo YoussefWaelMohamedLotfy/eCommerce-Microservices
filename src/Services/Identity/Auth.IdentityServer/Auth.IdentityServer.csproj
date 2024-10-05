@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>ea42d029-4273-4208-8596-8ae06afa1fba</UserSecretsId>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <DockerfileContext>..\..\..\..</DockerfileContext>
+        <DockerComposeProjectPath>..\..\..\..\docker-compose.dcproj</DockerComposeProjectPath>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="AspNetCore.HealthChecks.Elasticsearch" Version="7.0.0" />
+        <PackageReference Include="AspNetCore.HealthChecks.Sqlite" Version="7.0.0" />
+        <PackageReference Include="Duende.IdentityServer.AspNetIdentity" Version="6.3.6" />
+        <PackageReference Include="Duende.IdentityServer.EntityFramework" Version="6.3.6" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="7.0.12" />
+        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="7.0.12" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.12" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.12" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.12">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build, native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="7.0.12" />
+        <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.4" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\Shared\Shared.Utilites\Shared.Utilites.csproj" />
+    </ItemGroup>
+
+</Project>

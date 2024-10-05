@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>9145b4e0-6466-45f7-a102-a11be09d57fc</UserSecretsId>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <DockerfileContext>..\..\..\..</DockerfileContext>
+        <DockerComposeProjectPath>..\..\..\..\docker-compose.dcproj</DockerComposeProjectPath>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="AspNetCore.HealthChecks.Elasticsearch" Version="7.0.0" />
+        <PackageReference Include="AspNetCore.HealthChecks.OpenIdConnectServer" Version="7.0.0" />
+        <PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" Version="7.0.0" />
+        <PackageReference Include="AspNetCore.HealthChecks.Redis" Version="7.0.1" />
+        <PackageReference Include="Grpc.AspNetCore" Version="2.58.0" />
+        <PackageReference Include="MassTransit.RabbitMQ" Version="8.1.1" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.12" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.12" />
+        <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="7.0.12" />
+        <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.4" />
+        <PackageReference Include="Riok.Mapperly" Version="3.2.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\Shared\Shared.Utilites\Shared.Utilites.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Protobuf Include="Protos\discount.proto" GrpcServices="Client" />
+    </ItemGroup>
+
+ </Project>

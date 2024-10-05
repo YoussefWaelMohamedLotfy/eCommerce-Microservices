@@ -1,0 +1,200 @@
+version: '3.9'
+
+services:
+  catalogdb:
+    container_name: catalogdb
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo_data:/data/db
+
+  cartdb:
+    container_name: basketdb
+    restart: always
+    ports:
+      - 6379:6379
+
+  discountdb:
+    container_name: discountdb
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin1234
+      - POSTGRES_DB=DiscountDb
+    restart: always
+    ports:
+        - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+  orderdb:
+    container_name: orderdb
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=SwN12345678
+    restart: always
+    ports:
+        - 1433:1433
+
+  rabbitmq:
+    container_name: RabbitMQ
+    restart: always
+    ports:
+        - 5672:5672
+        - 15672:15672
+
+  cart.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=DockerDevelopment
+      # - ASPNETCORE_URLS=https://+:443;http://+:80
+    ports:
+      - 5137:80
+      # - 7154:443
+    # volumes:
+    #   - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+    #   - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    depends_on:
+      - cartdb
+      - rabbitmq
+
+  catalog.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=DockerDevelopment
+      # - ASPNETCORE_URLS=https://+:443;http://+:80
+    ports:
+      - 5079:80
+      # - 7206:443
+    # volumes:
+    #   - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+    #   - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    depends_on:
+      - catalogdb
+
+  pgadmin:
+    container_name: pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@gmail.com
+      - PGADMIN_DEFAULT_PASSWORD=admin1234
+      - PGADMIN_DEFAULT_MASTER_PASSWORD_REQUIRED=False
+      - PGADMIN_DEFAULT_SERVER_MODE=False
+    restart: always
+    ports:
+        - 5050:80
+    volumes:
+      - pgadmin_data:/root/.pgadmin
+    depends_on:
+      - discountdb
+
+  discount.grpc:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=DockerDevelopment
+      # - ASPNETCORE_URLS=https://+:443;http://+:80
+    ports:
+      - 5126:80
+      # - 7109:443
+    # volumes:
+    #   - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+    #   - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    depends_on:
+      - discountdb
+
+  identityserver:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=DockerDevelopment
+      # - ASPNETCORE_URLS=https://+:443;http://+:80
+    ports:
+      - 5002:80
+      # - 5001:443
+    # volumes:
+    #   - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+    #   - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+
+  ordering.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=DockerDevelopment
+      # - ASPNETCORE_URLS=https://+:443;http://+:80
+    ports:
+      - 5158:80
+      # - 7133:443
+    # volumes:
+    #   - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+    #   - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    depends_on:
+      - orderdb
+      - rabbitmq
+
+  webstatus:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=DockerDevelopment
+      # - ASPNETCORE_URLS=https://+:443;http://+:80
+    ports:
+      - 5013:80
+      # - 7153:443
+    # volumes:
+    #   - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+    #   - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    depends_on:
+      - elasticsearch
+
+  yarp.proxy:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=DockerDevelopment
+      # - ASPNETCORE_URLS=https://+:443;http://+:80
+    ports:
+      - 5154:80
+      # - 7038:443
+    # volumes:
+    #   - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+    #   - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+
+  elasticsearch:
+    container_name: elasticsearch
+    environment:
+        - xpack.security.enabled=false
+        - xpack.security.enrollment.enabled=false
+        - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+        - discovery.type=single-node
+    ports:
+        - 9200:9200
+        - 9300:9300
+    volumes:
+        - elasticsearch-data:/usr/share/elasticsearch/data   
+
+  kibana:
+    container_name: kibana
+    depends_on:
+        - elasticsearch
+    ports:
+        - 5601:5601
+
+  keycloak:
+    container_name: KeyCloak
+    ports:
+      - 8080:8080
+    restart: always
+    depends_on:
+      - postgresdb
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_HOSTNAME=localhost
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://postgresdb:5432/keycloak
+      - KC_DB_PORT=5432
+      - KC_DB_DATABASE=keycloak
+      - KC_DB_USERNAME=admin
+      - KC_DB_PASSWORD=admin1234
+      - TZ=Africa/Cairo
+    command: start-dev 
+
+  postgresdb:
+    container_name: KeyCloakDb
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin1234
+      - POSTGRES_DB=keycloak
+    restart: always
+    ports:
+        - 5433:5432
+    volumes:
+      - postgreskeycloak_data:/var/lib/postgresql/data/
